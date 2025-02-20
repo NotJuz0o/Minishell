@@ -9,6 +9,7 @@
 
 int is_direct_path(const char *cmd)
 {
+    int i = 0;
     return (cmd[0] == '/' || cmd[0] == '.');
 }
 
