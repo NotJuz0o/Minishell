@@ -28,27 +28,11 @@ pipeline {
                 }
                 stage('Coding Style') {
                     steps {
-                        sh '''#!/bin/bash
-                            DUMP_PATH=/tmp/coding-style-reports
-                            EXPORT_FILE="coding-style-reports.log"
-                            SELECTED_FILES=$(find . -type f -name "*.c" -o -name "*.h")
-                            
-                            # Vérification directe sans créer de script intermédiaire
-                            for file in $SELECTED_FILES; do
-                                echo "Checking $file"
-                                # Vérification des lignes de plus de 80 caractères
-                                awk 'length > 80 {print FILENAME ":" FNR ": line too long (" length " > 80 characters)"}' "$file" >> "$EXPORT_FILE"
-                                
-                                # Vérification des espaces en fin de ligne
-                                awk '/.*[[:space:]]+$/ {print FILENAME ":" FNR ": trailing space(s)"}' "$file" >> "$EXPORT_FILE"
-                                
-                                # Vérification des multiples lignes vides consécutives
-                                awk '/^$/ && p {print FILENAME ":" FNR ": too many consecutive empty lines"} {p=/^$/}' "$file" >> "$EXPORT_FILE"
-                            done
-
-                            if [ -s "$EXPORT_FILE" ]; then
+                        sh '''
+                            coding-style . .
+                            if [ -s coding-style-reports.log ]; then
                                 echo "Coding style errors found:"
-                                cat "$EXPORT_FILE"
+                                cat coding-style-reports.log
                                 exit 1
                             else
                                 echo "No coding style errors found"
@@ -61,7 +45,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'coding-style-reports.log', allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/coding-style-reports.log', allowEmptyArchive: true
             cleanWs()
         }
         success {
