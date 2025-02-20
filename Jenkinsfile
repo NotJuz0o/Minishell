@@ -19,7 +19,7 @@ pipeline {
             stages {
                 stage('Compilation') {
                     steps {
-                        sh '''
+                        sh '''#!/bin/bash
                             make fclean || true
                             make
                             make clean
@@ -28,8 +28,8 @@ pipeline {
                 }
                 stage('Coding Style') {
                     steps {
-                        sh '''
-                            coding-style . .
+                        sh '''#!/bin/bash
+                            /usr/bin/coding-style . .
                             if [ -s coding-style-reports.log ]; then
                                 echo "Coding style errors found:"
                                 cat coding-style-reports.log
